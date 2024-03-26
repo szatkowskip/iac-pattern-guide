@@ -10,7 +10,7 @@ resource "ibm_is_ssh_key" "iac_test_key" {
 
 resource "ibm_is_instance" "iac_test_instance" {
   name    = "${var.project_name}-${var.environment}-instance"
-  image   = "r006-14140f94-fcc4-11e9-96e7-a72723715315"
+  image   = "r010-52c87291-18c2-4b92-b07e-155a0a8f3d7e"
   profile = "cx2-2x4"
 
   primary_network_interface {
