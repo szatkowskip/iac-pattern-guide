@@ -25,8 +25,10 @@ resource "ibm_is_instance" "iac_test_instance" {
 
   user_data = <<-EOUD
               #!/bin/bash
-              echo "Hello!" > index.html
-              nohup busybox httpd -f -p ${var.port} &
+              yum install httpd -y
+              sed -i "s/^Listen.*/Listen ${var.port}/g" /etc/httpd/conf/httpd.conf
+              echo "Hello World!" > /var/www/html/index.html
+              systemctl enable --now httpd
               EOUD
 
   tags = ["iac-${var.project_name}-${var.environment}"]
