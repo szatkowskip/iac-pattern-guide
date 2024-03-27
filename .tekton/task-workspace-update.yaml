@@ -23,7 +23,7 @@ spec:
     - name: artifacts
       mountPath: /artifacts
   steps:
-    - name: update
+    - name: workspace-update
       image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.2
       envFrom:
         - configMapRef:
