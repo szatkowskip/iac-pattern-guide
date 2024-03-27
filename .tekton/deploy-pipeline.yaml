@@ -33,7 +33,7 @@ spec:
         - name: enable-automatic-plan-apply
           value: $(params.enable-automatic-plan-apply)
     - name: plan
-      runAfter: [update-workspace]
+      runAfter: [update]
       taskRef:
         name: plan-task
       workspaces:
