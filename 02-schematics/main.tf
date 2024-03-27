@@ -1,6 +1,6 @@
 provider "ibm" {
   generation = 2
-  region     = "us-south"
+  region     = "eu-de"
 }
 
 resource "ibm_is_ssh_key" "iac_test_key" {
@@ -20,7 +20,7 @@ resource "ibm_is_instance" "iac_test_instance" {
   }
 
   vpc  = ibm_is_vpc.iac_test_vpc.id
-  zone = "us-south-1"
+  zone = "eu-de-1"
   keys = [ibm_is_ssh_key.iac_test_key.id]
 
   user_data = <<-EOUD
