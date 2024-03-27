@@ -77,11 +77,13 @@ spec:
             else
               STATUS_VALUE=$(echo $STATUS | jq -r ".status")
               echo "Polling for status: $STATUS_VALUE"
-              if [ "$STATUS_VALUE" = "FAILED" ] || [ "$STATUS_VALUE" = "STOPPED" ] || [ "$STATUS_VALUE" = "TEMPLATE_ERROR" ]; then
+              if [ "$STATUS_VALUE" = "CREATED" ] || [ "$STATUS_VALUE" = "INPROGRESS"]; then
+                continue
+              elif [ "$STATUS_VALUE" = "COMPLETED" ]; then
+                break
+              else
                 ibmcloud terraform logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
                 exit 1
-              elif [ "$STATUS_VALUE" = "COMPLETED]; then  
-                break
               fi
             fi
             # sleep for 5 seconds, while waiting for completion
