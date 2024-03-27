@@ -27,7 +27,7 @@ resource "ibm_is_instance" "iac_test_instance" {
               #!/bin/bash
               yum install httpd -y
               sed -i "s/^Listen.*/Listen ${var.port}/g" /etc/httpd/conf/httpd.conf
-              echo "Hello World!" > /var/www/html/index.html
+              echo "Hello Nordcloud!" > /var/www/html/index.html
               systemctl enable --now httpd
               EOUD
 
