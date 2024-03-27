@@ -17,9 +17,9 @@ spec:
   workspaces:
     - name: artifacts
   tasks:
-    - name: update-workspace
+    - name: update
       taskRef:
-        name: update-workspace-task
+        name: update-task
       workspaces:
         - name: artifacts
           workspace: artifacts
