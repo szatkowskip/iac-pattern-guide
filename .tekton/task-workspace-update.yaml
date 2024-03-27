@@ -104,5 +104,5 @@ spec:
           # cleanup
           rm -f workspace.json
 
-          sleep 10
+          sleep 30
           unset WORKSPACE
