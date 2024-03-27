@@ -5,7 +5,7 @@ resource "ibm_is_vpc" "iac_test_vpc" {
 resource "ibm_is_subnet" "iac_test_subnet" {
   name            = "${var.project_name}-${var.environment}-subnet"
   vpc             = ibm_is_vpc.iac_test_vpc.id
-  zone            = "us-south-1"
+  zone            = "eu-de-1"
   ipv4_cidr_block = "10.240.0.0/24"
 }
 
