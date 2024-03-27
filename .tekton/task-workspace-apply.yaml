@@ -80,7 +80,7 @@ spec:
               if [ "$STATUS_VALUE" = "FAILED" ]; then
                 ibmcloud terraform logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
                 exit 1
-              elif [ "$STATUS_VALUE" == "COMPLETED" ]; then  
+              elif [ "$STATUS_VALUE" != "CREATED" ] && [ "$STATUS_VALUE" != "INPROGRESS" ]; then  
                 break
               fi
             fi
