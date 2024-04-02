@@ -44,7 +44,7 @@ spec:
         - name: ENABLE_PLAN_APPLY
           value: $(params.enable-automatic-plan-apply)
         - name: TF_VAR_environment
-          value: dev
+          value: prod
         - name: TF_VAR_project_name
           value: pszatkowski
         - name: TF_VAR_public_key
