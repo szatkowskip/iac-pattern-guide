@@ -101,8 +101,32 @@ spec:
           cp temp.json workspace.json
           ibmcloud terraform workspace update --id $WORKSPACE_ID --file workspace.json
 
+          # poll until status is INACTIVE, or if there is an error
+          while :
+          do
+            STATUS=$(ibmcloud terraform workspace get --id $WORKSPACE_ID --output json)
+            
+            RET_VAL=$?
+            if [ $RET_VAL -ne 0 ]; then
+              echo $STATUS
+              exit $RET_VAL
+            else
+              STATUS_VALUE=$(echo $STATUS | jq -r ".status")
+              echo "Polling for status: $STATUS_VALUE"
+              if [ "$STATUS_VALUE" = "DRAFT" ] || [ "$STATUS_VALUE" = "CONNECTING" ]; then
+                continue
+              elif [ "$STATUS_VALUE" = "INACTIVE" ]; then
+                ibmcloud terraform logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
+                exit 0
+              else
+                ibmcloud terraform logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
+                exit 1
+              fi
+            fi
+            # sleep for 5 seconds, while waiting for completion
+            sleep 5
+          done
+
           # cleanup
           rm -f workspace.json
-
-          sleep 30
           unset WORKSPACE

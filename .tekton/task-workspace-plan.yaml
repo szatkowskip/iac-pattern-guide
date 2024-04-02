@@ -64,7 +64,7 @@ spec:
           ACTIVITY=$(ibmcloud terraform plan -id $WORKSPACE_ID --json)
           ACTIVITY_ID=$(echo $ACTIVITY | jq -r ".activityid")
           echo "Activity ID   $ACTIVITY_ID"
-          # poll until status is no longer INPROGRESS, or if there is an error
+          # poll until status is COMPLETED, or if there is an error
           while :
           do
             STATUS=$(ibmcloud terraform workspace action --id $WORKSPACE_ID --act-id $ACTIVITY_ID --json)
