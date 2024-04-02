@@ -43,6 +43,8 @@ spec:
           value: $(params.ibmcloud-api)
         - name: ENABLE_PLAN_APPLY
           value: $(params.enable-automatic-plan-apply)
+        - name: environment
+          value: prod
       command: ["/bin/bash", "-c"]
       args:
         - |
