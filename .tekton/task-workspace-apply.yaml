@@ -73,7 +73,7 @@ spec:
             RET_VAL=$?
             if [ $RET_VAL -ne 0 ]; then
               echo $STATUS
-              #exit $RET_VAL
+              exit $RET_VAL
             else
               STATUS_VALUE=$(echo $STATUS | jq -r ".status")
               echo "Polling for status: $STATUS_VALUE"
@@ -88,6 +88,6 @@ spec:
               fi
             fi
             # sleep for 5 seconds, while waiting for completion
-            sleep 5
+            sleep 15
           done
           
