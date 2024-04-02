@@ -79,7 +79,6 @@ spec:
               if [ "$STATUS_VALUE" = "CREATED" ] || [ "$STATUS_VALUE" = "INPROGRESS" ]; then
                 # sleep for 5 seconds, while waiting for completion
                 sleep 5
-                continue
               elif [ "$STATUS_VALUE" = "COMPLETED" ]; then
                 ibmcloud terraform logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
                 exit 0

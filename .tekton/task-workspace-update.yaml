@@ -116,7 +116,6 @@ spec:
               if [ "$STATUS_VALUE" = "DRAFT" ] || [ "$STATUS_VALUE" = "CONNECTING" ]; then
                 # sleep for 5 seconds, while waiting for completion
                 sleep 5
-                continue
               elif [ "$STATUS_VALUE" = "INACTIVE" ]; then
                 ibmcloud terraform workspace get --id $WORKSPACE_ID
                 exit 0
