@@ -116,10 +116,10 @@ spec:
               if [ "$STATUS_VALUE" = "DRAFT" ] || [ "$STATUS_VALUE" = "CONNECTING" ]; then
                 continue
               elif [ "$STATUS_VALUE" = "INACTIVE" ]; then
-                ibmcloud terraform logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
+                ibmcloud terraform workspace get --id $WORKSPACE_ID
                 exit 0
               else
-                ibmcloud terraform logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
+                ibmcloud terraform workspace get --id $WORKSPACE_ID
                 exit 1
               fi
             fi
