@@ -44,7 +44,7 @@ spec:
         - name: ENABLE_PLAN_APPLY
           value: $(params.enable-automatic-plan-apply)
         - name: environment
-          value: prod
+          value: dev
       command: ["/bin/bash", "-c"]
       args:
         - |
@@ -92,10 +92,11 @@ spec:
                           --arg updateKey "$KEY" \
                           --arg updateVal "${!KEY}" \
                           '.template_data[0].variablestore = [.template_data[0].variablestore[] | if (.name == $updateKey) then (.value = $updateVal) else . end]' )
+                      echo "$WORKSPACE" > "temp.json"
                   else 
                       echo "It's NOT there, add it."
                       WORKSPACE=$(cat temp.json| jq -r ".template_data[0].variablestore[.template_data[0].variablestore| length] |= . + { \"name\": \"$KEY\", \"value\": \"${!KEY}\", \"type\": \"string\" }")
-                      
+                      echo "$WORKSPACE" > "temp.json"
                   fi
               fi
           done
