@@ -19,15 +19,6 @@ spec:
       description: the ibmcloud api key
     - name: enable-automatic-plan-apply
       description: if true, a plan and apply will be automatically executed upon changes to the template code
-    - name: TF_VAR_environment
-      description: environment name
-    - name: TF_VAR_project_name
-      description: project name
-    - name: TF_VAR_public_key
-      description: ssh public key
-    - name: TF_VAR_port
-      description: service port
-      default: 8080
   workspaces:
     - name: artifacts
       mountPath: /artifacts
@@ -53,13 +44,13 @@ spec:
         - name: ENABLE_PLAN_APPLY
           value: $(params.enable-automatic-plan-apply)
         - name: TF_VAR_environment
-          value: $(params.TF_VAR_environment)
+          value: dev
         - name: TF_VAR_project_name
-          value: $(params.TF_VAR_project_name)
+          value: pszatkowski
         - name: TF_VAR_public_key
-          value: $(params.TF_VAR_public_key)
+          value: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC9ntX/tfv0qD9u4DUK5Z1BUc/b+VKVGherbTjcW+rXxE/cYWc1drfiYv4oRDujOObXufriwApm+VbwMg7GtjG78q+dKHrYlPyW3Oj+pmS4NmxH6WE6Ca5MWIItQuxNJYqmBb+zQxmvRoalKjOyTlrCw5tQ9WBKyyklN2O/IP591hi77bJcmm4k6j4N4vrgmrm3EJkP/AKEbhU+M4qfgwJKRB+H2tqxko/xkIR+W3qfFyZUUCajVE14erKopqwkJJXTdoHlTQoMGbJaUoI+DolY0bA5ZyFcPxGNYBRhHb84cy2jhcg0D6qVEfwEOjLzfgMfsbo/ZFUBJU11QCE47GV8+o7g5oh9T3g2gD2m0DXvja2KNOyZXLFRtueQ5TxI4Zg3AfesofgcqCzuodHpZE+dgYCXYR5EirzhhDlqzy0SXo/JoilOqxmtzF89hM2bJsyMWcTmS1GSl5obfw8QtGpfUoiBTr2AGYt0EVGQm9SwbCj0Clhvdr1aeEMz8DikoTs= pawel.szatkowski@nordcloud.com
         - name: TF_VAR_port
-          value: $(params.TF_VAR_port)
+          value: 8080
       command: ["/bin/bash", "-c"]
       args:
         - |
