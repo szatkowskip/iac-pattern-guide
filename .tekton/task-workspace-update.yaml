@@ -21,7 +21,7 @@ spec:
       description: if true, a plan and apply will be automatically executed upon changes to the template code
     - name: TF_VAR_environment
       description: environment name
-    - name: TF_VAR_project
+    - name: TF_VAR_project_name
       description: project name
     - name: TF_VAR_public_key
       description: ssh public key
@@ -54,8 +54,8 @@ spec:
           value: $(params.enable-automatic-plan-apply)
         - name: TF_VAR_environment
           value: $(params.TF_VAR_environment)
-        - name: TF_VAR_project
-          value: $(params.TF_VAR_project)
+        - name: TF_VAR_project_name
+          value: $(params.TF_VAR_project_name)
         - name: TF_VAR_public_key
           value: $(params.TF_VAR_public_key)
         - name: TF_VAR_port
