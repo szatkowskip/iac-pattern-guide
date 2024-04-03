@@ -23,7 +23,7 @@ spec:
     - name: artifacts
       mountPath: /artifacts
   steps:
-    - name: terraform-apply
+    - name: schematics-apply
       image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.2
       env:
         - name: API_KEY
@@ -60,15 +60,15 @@ spec:
           # force login (required by schematics cli)
           ibmcloud login --apikey $API_KEY -a "$IBM_CLOUD_API" $REGION
 
-          # run terraform apply
-          echo "ibmcloud terraform apply --id $WORKSPACE_ID --force"
-          ACTIVITY=$(ibmcloud terraform apply -id $WORKSPACE_ID --json --force)
+          # run schematics apply
+          echo "ibmcloud schematics apply --id $WORKSPACE_ID --force"
+          ACTIVITY=$(ibmcloud schematics apply -id $WORKSPACE_ID --json --force)
           ACTIVITY_ID=$(echo $ACTIVITY | jq -r ".activityid")
           echo "Activity ID   $ACTIVITY_ID"
           # poll until status is COMPLETED, or if there is an error
           while :
           do
-            STATUS=$(ibmcloud terraform workspace action --id $WORKSPACE_ID --act-id $ACTIVITY_ID --json)
+            STATUS=$(ibmcloud schematics workspace action --id $WORKSPACE_ID --act-id $ACTIVITY_ID --json)
             
             RET_VAL=$?
             if [ $RET_VAL -ne 0 ]; then
@@ -81,10 +81,10 @@ spec:
                 # sleep for 5 seconds, while waiting for completion
                 sleep 5
               elif [ "$STATUS_VALUE" = "COMPLETED" ]; then
-                ibmcloud terraform logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
+                ibmcloud schematics logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
                 exit 0
               else
-                ibmcloud terraform logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
+                ibmcloud schematics logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
                 exit 1
               fi
             fi

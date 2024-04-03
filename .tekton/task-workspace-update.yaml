@@ -73,7 +73,7 @@ spec:
           # force login (required by schematics cli)
           ibmcloud login --apikey $API_KEY -a "$IBM_CLOUD_API" $REGION
           # get schematics workspace as json
-          WORKSPACE=$(ibmcloud terraform workspace get -i $WORKSPACE_ID --json)
+          WORKSPACE=$(ibmcloud schematics workspace get -i $WORKSPACE_ID --json)
           echo "Updating Schematics workspace from environment variables..."
           # iterate over ALL schematics worskpace variables to see if there is a matching env var
 
@@ -109,12 +109,12 @@ spec:
           done
 
           cp temp.json workspace.json
-          ibmcloud terraform workspace update --id $WORKSPACE_ID --file workspace.json
+          ibmcloud schematics workspace update --id $WORKSPACE_ID --file workspace.json
 
           # poll until status is INACTIVE, or if there is an error
           while :
           do
-            STATUS=$(ibmcloud terraform workspace get --id $WORKSPACE_ID --output json)
+            STATUS=$(ibmcloud schematics workspace get --id $WORKSPACE_ID --output json)
             
             RET_VAL=$?
             if [ $RET_VAL -ne 0 ]; then
@@ -127,10 +127,10 @@ spec:
                 # sleep for 5 seconds, while waiting for completion
                 sleep 5
               elif [ "$STATUS_VALUE" = "INACTIVE" ]; then
-                ibmcloud terraform workspace get --id $WORKSPACE_ID
+                ibmcloud schematics workspace get --id $WORKSPACE_ID
                 exit 0
               else
-                ibmcloud terraform workspace get --id $WORKSPACE_ID
+                ibmcloud schematics workspace get --id $WORKSPACE_ID
                 exit 1
               fi
             fi
