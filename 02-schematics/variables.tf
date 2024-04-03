@@ -6,3 +6,7 @@ variable "public_key" {}
 variable "port" {
   default = 8080
 }
+
+variable "region" {
+  default = "eu-de"
+}
