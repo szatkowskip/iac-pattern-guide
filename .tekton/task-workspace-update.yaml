@@ -91,7 +91,7 @@ spec:
               ENV_VAR="TF_VAR_${KEY}"
               if [ -n "${!ENV_VAR}" ]; then
                   echo "$KEY found with value '${!ENV_VAR}'"; 
-                  SEARCH=$(cat temp.json | jq ".template_data[0].values_metadata[]?.name")
+                  SEARCH=$(cat temp.json | jq ".template_data[0].variablestore[]?.name")
 
                   echo "$SEARCH"
                   
