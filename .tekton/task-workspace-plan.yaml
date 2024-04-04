@@ -23,7 +23,7 @@ spec:
     - name: artifacts
       mountPath: /artifacts
   steps:
-    - name: schematics-plan
+    - name: workspace-plan
       image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.2
       env:
         - name: API_KEY
