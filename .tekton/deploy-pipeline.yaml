@@ -17,9 +17,9 @@ spec:
   workspaces:
     - name: artifacts
   tasks:
-    - name: update
+    - name: pull
       taskRef:
-        name: update-task
+        name: pull-task
       workspaces:
         - name: artifacts
           workspace: artifacts
@@ -33,7 +33,7 @@ spec:
         - name: enable-automatic-plan-apply
           value: $(params.enable-automatic-plan-apply)
     - name: plan
-      runAfter: [update]
+      runAfter: [pull]
       taskRef:
         name: plan-task
       workspaces:

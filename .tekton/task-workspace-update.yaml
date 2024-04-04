@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: update-task
+  name: pull-task
 spec:
   params:
     - name: ibmcloud-apikey-secret-key
@@ -23,7 +23,7 @@ spec:
     - name: artifacts
       mountPath: /artifacts
   steps:
-    - name: workspace-update
+    - name: workspace-pull
       image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.2
       envFrom:
         - configMapRef:
@@ -65,7 +65,7 @@ spec:
           # force login (required by schematics cli)
           ibmcloud login --apikey $API_KEY -a "$IBM_CLOUD_API" $REGION
 
-          echo "Pull the latest changes into workspace..."
+          # pull the latest changes into the workspace
           ibmcloud schematics workspace update --id $WORKSPACE_ID --pull-latest
 
           # poll until status is INACTIVE, or if there is an error
