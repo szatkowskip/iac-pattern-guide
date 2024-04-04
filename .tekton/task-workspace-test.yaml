@@ -29,3 +29,7 @@ spec:
       command: ["/bin/bash", "-c"]
       args:
         - echo "You can add tests here to ensure that your resources are healthy!"
+        # oc get nodes
+        # oc get clusteroperators
+        # oc get pods --all-namespaces
+        # oc get events --sort-by='.lastTimestamp'

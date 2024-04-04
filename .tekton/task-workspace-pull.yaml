@@ -84,10 +84,8 @@ spec:
                 # sleep for 5 seconds, while waiting for completion
                 sleep 5
               elif [ "$STATUS_VALUE" = "INACTIVE" ]; then
-                ibmcloud schematics workspace get --id $WORKSPACE_ID
                 exit 0
               else
-                ibmcloud schematics workspace get --id $WORKSPACE_ID
                 exit 1
               fi
             fi
