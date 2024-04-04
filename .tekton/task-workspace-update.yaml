@@ -43,14 +43,6 @@ spec:
           value: $(params.ibmcloud-api)
         - name: ENABLE_PLAN_APPLY
           value: $(params.enable-automatic-plan-apply)
-        - name: TF_VAR_environment
-          value: prod
-        - name: TF_VAR_project_name
-          value: pszatkowski
-        - name: TF_VAR_region
-          value: eu-de
-        - name: TF_VAR_public_key
-          value: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC9ntX/tfv0qD9u4DUK5Z1BUc/b+VKVGherbTjcW+rXxE/cYWc1drfiYv4oRDujOObXufriwApm+VbwMg7GtjG78q+dKHrYlPyW3Oj+pmS4NmxH6WE6Ca5MWIItQuxNJYqmBb+zQxmvRoalKjOyTlrCw5tQ9WBKyyklN2O/IP591hi77bJcmm4k6j4N4vrgmrm3EJkP/AKEbhU+M4qfgwJKRB+H2tqxko/xkIR+W3qfFyZUUCajVE14erKopqwkJJXTdoHlTQoMGbJaUoI+DolY0bA5ZyFcPxGNYBRhHb84cy2jhcg0D6qVEfwEOjLzfgMfsbo/ZFUBJU11QCE47GV8+o7g5oh9T3g2gD2m0DXvja2KNOyZXLFRtueQ5TxI4Zg3AfesofgcqCzuodHpZE+dgYCXYR5EirzhhDlqzy0SXo/JoilOqxmtzF89hM2bJsyMWcTmS1GSl5obfw8QtGpfUoiBTr2AGYt0EVGQm9SwbCj0Clhvdr1aeEMz8DikoTs= pawel.szatkowski@nordcloud.com
       command: ["/bin/bash", "-c"]
       args:
         - |
@@ -72,44 +64,9 @@ spec:
 
           # force login (required by schematics cli)
           ibmcloud login --apikey $API_KEY -a "$IBM_CLOUD_API" $REGION
-          # get schematics workspace as json
-          WORKSPACE=$(ibmcloud schematics workspace get -i $WORKSPACE_ID --json)
-          echo "Updating Schematics workspace from environment variables..."
-          # iterate over ALL schematics worskpace variables to see if there is a matching env var
 
-          if jq -e . >/dev/null 2>&1 <<<"$WORKSPACE"; then
-              echo "$WORKSPACE" > "temp.json"
-          else
-              echo "$WORKSPACE" | head -n -1 > "temp.json"
-          fi
-
-          for KEY in $(cat temp.json | jq ".template_data[0].values_metadata[].name" -r); do
-              
-              # if the value exists as an env var, update the workspace
-              ENV_VAR="TF_VAR_${KEY}"
-              if [ -n "${!ENV_VAR}" ]; then
-                  echo "$KEY found with value '${!ENV_VAR}'"; 
-                  SEARCH=$(cat temp.json | jq ".template_data[0].variablestore[]?.name")
-
-                  echo "$SEARCH"
-                  
-                  if [[ "$SEARCH" =~ .*"$KEY".* ]]; then
-                      echo "It's there, update it."
-                      WORKSPACE=$(cat temp.json | jq -r \
-                          --arg updateKey "$KEY" \
-                          --arg updateVal "${!ENV_VAR}" \
-                          '.template_data[0].variablestore = [.template_data[0].variablestore[] | if (.name == $updateKey) then (.value = $updateVal) else . end]' )
-                      echo "$WORKSPACE" > "temp.json"
-                  else 
-                      echo "It's NOT there, add it."
-                      WORKSPACE=$(cat temp.json| jq -r ".template_data[0].variablestore[.template_data[0].variablestore| length] |= . + { \"name\": \"$KEY\", \"value\": \"${!ENV_VAR}\", \"type\": \"string\" }")
-                      echo "$WORKSPACE" > "temp.json"
-                  fi
-              fi
-          done
-
-          cp temp.json workspace.json
-          ibmcloud schematics workspace update --id $WORKSPACE_ID --file workspace.json
+          echo "Pull the latest changes into workspace..."
+          ibmcloud schematics workspace update --id $WORKSPACE_ID --pull-latest
 
           # poll until status is INACTIVE, or if there is an error
           while :
@@ -135,7 +92,3 @@ spec:
               fi
             fi
           done
-
-          # cleanup
-          rm -f workspace.json
-          unset WORKSPACE
