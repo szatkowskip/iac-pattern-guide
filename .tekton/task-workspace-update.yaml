@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: pull-task
+  name: update-task
 spec:
   params:
     - name: ibmcloud-apikey-secret-key
@@ -23,7 +23,7 @@ spec:
     - name: artifacts
       mountPath: /artifacts
   steps:
-    - name: workspace-pull
+    - name: workspace-update
       image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.2
       envFrom:
         - configMapRef:
