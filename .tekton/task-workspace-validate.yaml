@@ -68,7 +68,7 @@ spec:
           git clone $WORKSPACE_REPO_URL
           cd /artifacts/$WORKSPACE_REPO_NAME
 
-          ls -la /artifacts/$REPO_NAME/$WORKSPACE_FOLDER_PATH/
+          ls -la /artifacts/$WORKSPACE_REPO_NAME/$WORKSPACE_FOLDER_PATH/
 
 
 
