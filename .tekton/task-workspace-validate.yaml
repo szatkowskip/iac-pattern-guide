@@ -70,7 +70,7 @@ spec:
           cd /artifacts/$WORKSPACE_REPO_NAME
 
           # run pre-commit
-          python --version
+          ls -la /usr/bin/ | grep python
           pre-commit install --install-hooks
           #pre-commit run --all-files
 
