@@ -44,7 +44,7 @@ spec:
           #!/bin/bash
 
           # Setup pre-commit
-          yum search pip
+          yum update -yq && yum install -yq python3-pip
           pip install pre-commit
           pre-commit --version
 
