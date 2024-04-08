@@ -61,7 +61,7 @@ spec:
           ibmcloud login --apikey $API_KEY -a "$IBM_CLOUD_API" $REGION
 
           WORKSPACE_REPO_URL=$(ibmcloud schematics workspace get --id $WORKSPACE_ID --json | jq -r ".template_repo.url")
-          WORKSPACE_REPO_NAME=$(echo "$GH_REPO" | awk -F'/' '{print $NF}')
+          WORKSPACE_REPO_NAME=$(echo "$WORKSPACE_REPO_URL" | awk -F'/' '{print $NF}')
           WORKSPACE_FOLDER_PATH=$(ibmcloud schematics workspace get --id $WORKSPACE_ID --json | jq -r '.template_data[0].folder')
 
           cd /artifacts
