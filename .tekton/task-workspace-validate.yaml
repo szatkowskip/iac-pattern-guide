@@ -28,4 +28,13 @@ spec:
           value: $(params.enable-automatic-plan-apply)
       command: ["/bin/bash", "-c"]
       args:
-        - pre-commit --help
+        - |
+        #!/bin/bash
+
+        # Setup pre-commit
+        pip install pre-commit
+        pre-commit --version
+
+        # Test
+        ls -la
+
