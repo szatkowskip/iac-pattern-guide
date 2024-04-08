@@ -72,6 +72,8 @@ spec:
           # run pre-commit
           #yum search python3
           ls -la /usr/bin/ | grep python
+          alternatives --display python
+          alternatives --config python
           pre-commit install --install-hooks
           #pre-commit run --all-files
 
