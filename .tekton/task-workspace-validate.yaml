@@ -44,6 +44,7 @@ spec:
           #!/bin/bash
 
           # Setup pre-commit
+          python -m ensurepip --upgrade
           pip install pre-commit
           pre-commit --version
 
