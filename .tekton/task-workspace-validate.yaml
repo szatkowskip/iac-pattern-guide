@@ -70,6 +70,7 @@ spec:
           cd /artifacts/$WORKSPACE_REPO_NAME
 
           # run pre-commit
+          yum search python3
           ls -la /usr/bin/ | grep python
           pre-commit install --install-hooks
           #pre-commit run --all-files
