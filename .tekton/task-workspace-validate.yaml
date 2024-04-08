@@ -20,6 +20,12 @@ spec:
     - name: pre-commit
       image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.2
       env:
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: $(params.continuous-delivery-context-secret)
+              key: $(params.ibmcloud-apikey-secret-key)
+              optional: true
         - name: WORKSPACE_ID
           value: $(params.WORKSPACE_ID)
         - name: IBM_CLOUD_API
@@ -32,8 +38,8 @@ spec:
           #!/bin/bash
 
           # Setup pre-commit
-          pip install pre-commit
-          pre-commit --version
+          #pip install pre-commit
+          #pre-commit --version
 
           # Test
           echo "Workspace $WORKSPACE_ID"
