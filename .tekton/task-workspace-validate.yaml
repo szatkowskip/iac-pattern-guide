@@ -36,5 +36,7 @@ spec:
           pre-commit --version
 
           # Test
-          ls -la /workspace
+          github repo clone nordcloud/mco-ibm-cloud
+          cd mco-ibm-cloud
+          ls -la
 
