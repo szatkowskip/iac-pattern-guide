@@ -17,7 +17,23 @@ spec:
   workspaces:
     - name: artifacts
   tasks:
+    - name: validate
+      taskRef:
+        name: validate-task
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: WORKSPACE_ID
+          value: $(params.WORKSPACE_ID)
+        - name: ibmcloud-api
+          value: $(params.ibmcloud-api)
+        - name: apikey
+          value: $(params.apikey)
+        - name: enable-automatic-plan-apply
+          value: $(params.enable-automatic-plan-apply)
     - name: update
+      runAfter: [validate]
       taskRef:
         name: update-task
       workspaces:
