@@ -29,12 +29,12 @@ spec:
       command: ["/bin/bash", "-c"]
       args:
         - |
-        #!/bin/bash
-
-        # Setup pre-commit
-        pip install pre-commit
-        pre-commit --version
-
-        # Test
-        ls -la
+          #!/bin/bash
+  
+          # Setup pre-commit
+          pip install pre-commit
+          pre-commit --version
+  
+          # Test
+          ls -la
 
