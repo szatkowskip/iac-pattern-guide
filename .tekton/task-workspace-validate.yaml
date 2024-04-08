@@ -70,6 +70,7 @@ spec:
           git clone $WORKSPACE_REPO_URL
           cd /artifacts/$WORKSPACE_REPO_NAME
           git fetch --all
+          git config advice.detachedHead false
           git checkout $WORKSPACE_REPO_COMMIT
 
           # run pre-commit
