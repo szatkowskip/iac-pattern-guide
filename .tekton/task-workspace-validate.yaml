@@ -70,10 +70,7 @@ spec:
           cd /artifacts/$WORKSPACE_REPO_NAME
 
           # run pre-commit
-          ls -la ./
           pre-commit install --install-hooks
-          ls -la ./
-          cat .pre-commit-config.yaml
           pre-commit run --all-files
 
           exit 1

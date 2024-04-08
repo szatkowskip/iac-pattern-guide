@@ -1,0 +1,42 @@
+---
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.5.0
+  hooks:
+  - id: trailing-whitespace
+  - id: end-of-file-fixer
+  - id: check-xml
+  - id: check-yaml
+    args: [ '--allow-multiple-documents', '--unsafe' ]
+    exclude: |
+      (?x)^(
+          .*/templates/.*.yaml|
+          .*.template.yaml
+      )$
+  - id: check-toml
+  - id: check-json
+  - id: check-added-large-files
+  - id: check-case-conflict
+  - id: detect-aws-credentials
+    args: [ '--allow-missing-credentials' ]
+  - id: detect-private-key
+  - id: check-executables-have-shebangs
+- repo: https://github.com/jumanjihouse/pre-commit-hooks
+  rev: 3.0.0
+  hooks:
+  - id: forbid-binary
+    exclude: |
+      (?x)^(
+        .*.png
+      )$
+  - id: git-check
+  # TODO reenable when ruby3.0 is not required
+  # - id: markdownlint
+  - id: require-ascii
+  - id: shellcheck
+  - id: shfmt
+- repo: https://github.com/adrienverge/yamllint.git
+  rev: v1.35.1
+  hooks:
+  - id: yamllint
+    entry: yamllint --strict
