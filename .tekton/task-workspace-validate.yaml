@@ -44,11 +44,8 @@ spec:
           #!/bin/bash
 
           # install pre-commit
-          yum update -yq && yum install -yq python3.11-pip
+          yum update -yq && yum install -yq python3.11 python3.11-pip
           alternatives --set python3 /usr/bin/python3.11
-          #alternatives --set python /usr/bin/python3.11
-          #alternatives --display python
-          alternatives --display python3
           pip3 install pre-commit
           pre-commit --version
 
