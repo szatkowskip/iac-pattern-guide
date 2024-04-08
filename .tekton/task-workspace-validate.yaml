@@ -43,7 +43,7 @@ spec:
         - |
           #!/bin/bash
 
-          # Setup pre-commit
+          # install pre-commit
           yum update -yq && yum install -yq python3-pip
           pip3 install pre-commit
           pre-commit --version
@@ -64,12 +64,14 @@ spec:
           WORKSPACE_REPO_NAME=$(echo "$WORKSPACE_REPO_URL" | awk -F'/' '{print $NF}')
           WORKSPACE_FOLDER_PATH=$(ibmcloud schematics workspace get --id $WORKSPACE_ID --json | jq -r '.template_data[0].folder')
 
+          # clone the repository
           cd /artifacts
           git clone $WORKSPACE_REPO_URL
-
           cd /artifacts/$WORKSPACE_REPO_NAME
-          pre-commit install --hook-type-args $WORKSPACE_FOLDER_PATH
-          pre-commit run
+
+          # run pre-commit
+          pre-commit install
+          pre-commit run --file /artifacts/$WORKSPACE_REPO_NAME/$WORKSPACE_FOLDER_PATH
 
           exit 1
       volumeMounts:
