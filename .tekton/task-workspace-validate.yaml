@@ -68,15 +68,13 @@ spec:
           cd /artifacts/$WORKSPACE_REPO_NAME
 
           ls -la /artifacts/$WORKSPACE_REPO_NAME/$WORKSPACE_FOLDER_PATH/
-          ls -la /steps/
+          ls -la /cd-config/
 
           exit 1
       volumeMounts:
-        - mountPath: /steps
-          name: steps-volume
+        - mountPath: /cd-config
+          name: cd-config-volume
   volumes:
-    - name: steps-volume
-      emptyDir: {}
     - name: cd-config-volume
       configMap:
         name: toolchain
