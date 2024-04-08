@@ -44,7 +44,7 @@ spec:
           #!/bin/bash
 
           # Setup pre-commit
-          yum --help
+          yum install pip -y
           pip install pre-commit
           pre-commit --version
 
