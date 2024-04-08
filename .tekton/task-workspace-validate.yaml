@@ -30,11 +30,11 @@ spec:
       args:
         - |
           #!/bin/bash
-  
+
           # Setup pre-commit
           pip install pre-commit
           pre-commit --version
-  
+
           # Test
-          ls -la
+          ls -la /workspace
 
