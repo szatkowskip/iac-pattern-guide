@@ -63,18 +63,17 @@ spec:
           WORKSPACE_REPO_URL=$(ibmcloud schematics workspace get --id $WORKSPACE_ID --json | jq -r ".template_repo.url")
           WORKSPACE_REPO_NAME=$(echo "$WORKSPACE_REPO_URL" | awk -F'/' '{print $NF}')
           WORKSPACE_FOLDER_PATH=$(ibmcloud schematics workspace get --id $WORKSPACE_ID --json | jq -r '.template_data[0].folder')
-          WORKSPACE_COMMIT=$("todo")
+          WORKSPACE_COMMIT=$(ibmcloud schematics workspace get --id $WORKSPACE_ID --json | jq -r ".template_repo.commit_id")
 
           # clone the repository
           cd /artifacts
-          git clone $WORKSPACE_REPO_URL
+          git clone --branch $WORKSPACE_COMMIT --single-branch $WORKSPACE_REPO_URL
+          #git clone $WORKSPACE_REPO_URL
           cd /artifacts/$WORKSPACE_REPO_NAME
 
           # run pre-commit
           pre-commit install --install-hooks
           pre-commit run --all-files
-
-          exit 1
       volumeMounts:
         - mountPath: /cd-config
           name: cd-config-volume
