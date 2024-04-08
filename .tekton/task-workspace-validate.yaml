@@ -45,7 +45,7 @@ spec:
 
           # install pre-commit
           yum update -yq && yum install -yq python3.11-pip
-          alternatives --config python3.11
+          #alternatives --set python3 /usr/bin/python3.9
           pip3 install pre-commit
           pre-commit --version
 
@@ -64,6 +64,7 @@ spec:
           WORKSPACE_REPO_URL=$(ibmcloud schematics workspace get --id $WORKSPACE_ID --json | jq -r ".template_repo.url")
           WORKSPACE_REPO_NAME=$(echo "$WORKSPACE_REPO_URL" | awk -F'/' '{print $NF}')
           WORKSPACE_FOLDER_PATH=$(ibmcloud schematics workspace get --id $WORKSPACE_ID --json | jq -r '.template_data[0].folder')
+          WORKSPACE_BRANCH=$("todo")
 
           # clone the repository
           cd /artifacts
@@ -74,6 +75,7 @@ spec:
           #yum search python3
           ls -la /usr/bin/ | grep python
           alternatives --display python
+          alternatives --config python
           pre-commit install --install-hooks
           #pre-commit run --all-files
 
