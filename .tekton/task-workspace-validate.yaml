@@ -43,11 +43,10 @@ spec:
         - |
           #!/bin/bash
 
-          # install pre-commit
+          # install python3.11 and pre-commit
           yum update -yq && yum install -yq python3.11 python3.11-pip
           alternatives --set python3 /usr/bin/python3.11
           pip3 install pre-commit
-          pre-commit --version
 
           echo "Workspace $WORKSPACE_ID"
 
@@ -73,7 +72,7 @@ spec:
 
           # run pre-commit
           pre-commit install --install-hooks
-          #pre-commit run --all-files
+          pre-commit run --all-files
 
           exit 1
       volumeMounts:
