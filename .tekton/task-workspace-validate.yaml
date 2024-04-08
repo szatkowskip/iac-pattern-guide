@@ -71,7 +71,8 @@ spec:
 
           # run pre-commit
           pre-commit install
-          pre-commit run --file /artifacts/$WORKSPACE_REPO_NAME/$WORKSPACE_FOLDER_PATH
+          pre-commit run --all-files
+          cat /root/.cache/pre-commit/pre-commit.log
 
           exit 1
       volumeMounts:
