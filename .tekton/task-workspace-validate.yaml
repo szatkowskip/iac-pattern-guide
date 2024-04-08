@@ -63,4 +63,5 @@ spec:
           GH_REPO=$(ibmcloud schematics workspace get --id eu-de.workspace.schematics-cicd.fe97abc7 --json | jq -r ".template_repo.url")
           git clone $GH_REPO
           ls -la
+          ls -la artifacts/
 
