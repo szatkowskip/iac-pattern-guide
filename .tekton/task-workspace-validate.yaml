@@ -60,8 +60,15 @@ spec:
           # force login (required by schematics cli)
           ibmcloud login --apikey $API_KEY -a "$IBM_CLOUD_API" $REGION
 
-          GH_REPO=$(ibmcloud schematics workspace get --id eu-de.workspace.schematics-cicd.fe97abc7 --json | jq -r ".template_repo.url")
-          git clone $GH_REPO
-          ls -la
-          ls -la artifacts/
+          REPO_URL=$(ibmcloud schematics workspace get --id eu-de.workspace.schematics-cicd.fe97abc7 --json | jq -r ".template_repo.url")
+          REPO_NAME=$(echo "$GH_REPO" | awk -F'/' '{print $NF}')
+          FOLDER_PATH=$(ibmcloud schematics workspace get --id eu-de.workspace.schematics-cicd.fe97abc7 --json | jq -r ".template_data.folder")
+
+          cd /artifacts
+          git clone $REPO_URL
+          cd /artifacts/$REPO_NAME
+
+          ls -la /artifacts/$REPO_NAME/$FOLDER_PATH/
+
+
 
