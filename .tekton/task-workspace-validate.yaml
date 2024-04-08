@@ -70,8 +70,9 @@ spec:
           cd /artifacts/$WORKSPACE_REPO_NAME
 
           # run pre-commit
+          python --version
           pre-commit install --install-hooks
-          pre-commit run --all-files
+          #pre-commit run --all-files
 
           exit 1
       volumeMounts:
