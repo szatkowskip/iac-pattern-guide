@@ -45,8 +45,6 @@ spec:
 
           # Setup pre-commit
           yum update -yq && yum install -yq python3-pip
-          ls -la /usr/bin/ | grep pip
-          whereis pip3
           pip3 install pre-commit
           pre-commit --version
 
@@ -68,10 +66,10 @@ spec:
 
           cd /artifacts
           git clone $WORKSPACE_REPO_URL
-          cd /artifacts/$WORKSPACE_REPO_NAME
 
-          ls -la /artifacts/$WORKSPACE_REPO_NAME/$WORKSPACE_FOLDER_PATH/
-          ls -la /cd-config/
+          cd /artifacts/$WORKSPACE_REPO_NAME
+          pre-commit install --hook-type-args $WORKSPACE_FOLDER_PATH
+          pre-commit run
 
           exit 1
       volumeMounts:
