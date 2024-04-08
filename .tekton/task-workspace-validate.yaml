@@ -68,7 +68,7 @@ spec:
           cd /artifacts/$WORKSPACE_REPO_NAME
 
           ls -la /artifacts/$WORKSPACE_REPO_NAME/$WORKSPACE_FOLDER_PATH/
-          ls -la /
+          ls -la /tekton/
 
           exit 1
 
