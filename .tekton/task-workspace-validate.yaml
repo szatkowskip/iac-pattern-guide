@@ -44,7 +44,7 @@ spec:
           #!/bin/bash
 
           # install pre-commit
-          yum update -yq && yum install -yq python3-pip
+          yum update -yq && yum install -yq python3.11-pip
           pip3 install pre-commit
           pre-commit --version
 
@@ -70,8 +70,8 @@ spec:
           cd /artifacts/$WORKSPACE_REPO_NAME
 
           # run pre-commit
-          yum search python3
-          ls -la /usr/bin/ | grep python
+          #yum search python3
+          #ls -la /usr/bin/ | grep python
           pre-commit install --install-hooks
           #pre-commit run --all-files
 
