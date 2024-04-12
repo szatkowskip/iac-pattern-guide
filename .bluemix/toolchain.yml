@@ -20,8 +20,8 @@ toolchain:
     getting_started:
       $ref: "#/messages/template.gettingStarted"
 services:
-  github-repository:
-    service_id: GitHub
+  github:
+    service_id: githubconsolidated
     parameters:
       repo_name:  iac-pattern-guide
       repo_url: https://github.com/szatkowskip/iac-pattern-guide
