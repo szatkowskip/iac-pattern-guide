@@ -34,20 +34,10 @@ services:
     service_id: >
       $env.source_provider ? $env.source_provider : 'hostedgit'
     parameters:
-      repo_name: "schematics-pipeline-{{timestamp}}"
-      repo_url: >
-        if ( $env.template.info.hosted_region !== "" ) {
-          "https://{{template.info.hosted_region}}.git.cloud.ibm.com/open-toolchain/schematics-toolchain"
-        } else {
-          "https://github.com/open-toolchain/schematics-toolchain"
-        }
-      source_repo_url: >
-        if ( $env.template.info.hosted_region !== "" ) {
-          "https://{{template.info.hosted_region}}.git.cloud.ibm.com/open-toolchain/schematics-toolchain"
-        } else {
-          "https://github.com/open-toolchain/schematics-toolchain"
-        }
-      type: "clone"
+      repo_name: "iac-pattern-guide"
+      repo_url: test
+      source_repo_url: test
+      type: "exist"
       has_issues: false
       enable_traceability: false
       legal: true
