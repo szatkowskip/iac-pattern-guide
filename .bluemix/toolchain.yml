@@ -20,20 +20,13 @@ toolchain:
     getting_started:
       $ref: "#/messages/template.gettingStarted"
 services:
-  terraform-template:
-    service_id: >
-      $env.source_provider ? $env.source_provider : 'hostedgit'
+  github-repository:
+    service_id: GitHub
     parameters:
-      repo_name: >
-        $env.templateRepoName ? '{{templateRepoName}}' : 'schematics-ws-{{workspaceId}}-{{timestamp}}'
-      repo_url: >
-        $env.type === 'link' ?
-          $env.app_repo : 'https://github.com/Cloud-Schematics/cluster'
-      source_repo_url: >
-        $env.type === 'fork' || $env.type === 'clone' ? $env.app_repo : 
-          $env.templateEncodedZip ? '{{templateEncodedZip}}' : 
-          'https://github.com/Cloud-Schematics/cluster'
-      type: $env.type || 'clone'
+      repo_name:  iac-pattern-guide
+      repo_url: https://github.com/szatkowskip/iac-pattern-guide
+      source_repo_url: https://github.com/szatkowskip/iac-pattern-guide
+      type: exist
       has_issues: true
       enable_traceability: true
       legal: true
