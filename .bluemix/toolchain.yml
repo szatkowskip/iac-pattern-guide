@@ -24,7 +24,7 @@ services:
     service_id: githubconsolidated
     parameters:
       auth_type: pat
-      type: existing
+      type: link
       repo_url: https://github.com/szatkowskip/iac-pattern-guide
       has_issues: true
       enable_traceability: true
