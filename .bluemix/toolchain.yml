@@ -39,7 +39,7 @@ services:
       enable_traceability: false
       legal: true
       kind: ["pipeline"]
-  tekton-deploy-pipeline:
+  deploy-pipeline:
     parameters:
       label: deploy-pipeline
       type: tekton
