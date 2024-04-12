@@ -29,5 +29,15 @@ services:
       has_issues: true
       enable_traceability: true
       legal: true
+  delivery-pipeline:
+    service_id: pipeline
+    parameters:
+      repo_name: iac-pattern-guide
+      repo_url: https://github.com/szatkowskip/iac-pattern-guide
+      type: link
+      has_issues: false
+      enable_traceability: false
+      legal: true
+      kind: ["pipeline"]
 form: {}
 
