@@ -52,7 +52,7 @@ spec:
         name: pipelinerun-$(uid)
       spec:
         pipelineRef:
-          name: deploy-pipeline
+          name: main-pipeline
         podTemplate:
           imagePullSecrets:
             - name: icr-pull-secret

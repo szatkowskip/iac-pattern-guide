@@ -1,0 +1,299 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: workspace-task
+spec:
+  params:
+    - name: ibmcloud-apikey-secret-key
+      description: field in the secret that contains the api key used to login to ibmcloud
+      default: apikey
+    - name: continuous-delivery-context-secret
+      description: Reference name for the secret resource
+      default: "secure-properties"
+    - name: WORKSPACE_ID
+      description: The workspace id
+    - name: ibmcloud-api
+      description: the ibmcloud api
+      default: https://cloud.ibm.com
+    - name: apikey
+      description: the ibmcloud api key
+    - name: git-token
+      description: token to access the git repository
+    - name: enable-automatic-plan-apply
+      description: if true, a plan and apply will be automatically executed upon changes to the template code
+  workspaces:
+    - name: artifacts
+      mountPath: /artifacts
+  steps:
+    - name: workspace-update
+      #image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.41
+      image: de.icr.io/sandbox-nordcloud/pipeline-ubi:dev
+      envFrom:
+        - configMapRef:
+            name: environment-properties
+        - secretRef:
+            name: secure-properties
+      env:
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: $(params.continuous-delivery-context-secret)
+              key: $(params.ibmcloud-apikey-secret-key)
+              optional: true
+        - name: WORKSPACE_ID
+          value: $(params.WORKSPACE_ID)
+        - name: IBM_CLOUD_API
+          value: $(params.ibmcloud-api)
+        - name: ENABLE_PLAN_APPLY
+          value: $(params.enable-automatic-plan-apply)
+      command: ["/bin/bash", "-c"]
+      args:
+        - |
+          #!/bin/bash
+
+          if [ "$ENABLE_PLAN_APPLY" != "true" ]; then
+            echo "Automatic plan and apply have been disabled. Re-enable by setting the enable-automatic-plan-apply environment property to true."
+            exit 0
+          fi
+
+          echo "Workspace $WORKSPACE_ID"
+
+          REGION="--no-region"
+          # only parse the region if its the *NEW* workspace id format
+          if [[ "$WORKSPACE_ID" == *".workspace"* ]]; then
+              REGION=" -r $(echo $WORKSPACE_ID | cut -f1 -d.)"
+          fi
+          echo "REGION: $REGION"
+
+          # force login (required by schematics cli)
+          ibmcloud login --apikey $API_KEY -a "$IBM_CLOUD_API" $REGION
+
+          # pull the latest changes into the workspace
+
+          # don't use 'ibmcloud schematics workspace update --id $WORKSPACE_ID --pull-latest' as it removes branch
+          ibmcloud schematics workspace get --id $WORKSPACE_ID --json > workspace.json
+          ibmcloud schematics workspace update --id $WORKSPACE_ID --file workspace.json
+
+          # poll until status is INACTIVE, or if there is an error
+          while :
+          do
+            STATUS=$(ibmcloud schematics workspace get --id $WORKSPACE_ID --output json)
+
+            RET_VAL=$?
+            if [ $RET_VAL -ne 0 ]; then
+              echo $STATUS
+              exit $RET_VAL
+            else
+              STATUS_VALUE=$(echo $STATUS | jq -r ".status")
+              echo "Polling for status: $STATUS_VALUE"
+              if [ "$STATUS_VALUE" = "DRAFT" ] || [ "$STATUS_VALUE" = "CONNECTING" ]; then
+                # sleep for 5 seconds, while waiting for completion
+                sleep 5
+              elif [ "$STATUS_VALUE" = "INACTIVE" ]; then
+                exit 0
+              else
+                exit 1
+              fi
+            fi
+          done
+      when: |
+        {{ tasks.workspace-update.results.success }} && "$(tasks.workspace-update.results.condition)" == "true"
+    - name: pre-commit
+      #image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.41
+      image: de.icr.io/sandbox-nordcloud/pipeline-ubi:dev
+      env:
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: $(params.continuous-delivery-context-secret)
+              key: $(params.ibmcloud-apikey-secret-key)
+              optional: true
+        - name: GIT_TOKEN
+          value: $(params.git-token)
+        - name: WORKSPACE_ID
+          value: $(params.WORKSPACE_ID)
+        - name: IBM_CLOUD_API
+          value: $(params.ibmcloud-api)
+        - name: ENABLE_PLAN_APPLY
+          value: $(params.enable-automatic-plan-apply)
+      command: ["/bin/bash", "-c"]
+      args:
+        - |
+          #!/bin/bash
+
+          echo "Workspace $WORKSPACE_ID"
+          REGION="--no-region"
+          # only parse the region if its the *NEW* workspace id format
+          if [[ "$WORKSPACE_ID" == *".workspace"* ]]; then
+              REGION=" -r $(echo $WORKSPACE_ID | cut -f1 -d.)"
+          fi
+          echo "REGION: $REGION"
+
+          # force login (required by schematics cli)
+          ibmcloud login --apikey $API_KEY -a "$IBM_CLOUD_API" $REGION
+
+          # clone the repository
+          GIT_AUTH_USER="x-oauth-basic"
+          GIT_REPO_URL=$(ibmcloud schematics workspace get --id "$WORKSPACE_ID" --json | jq -r ".template_repo.url")
+          GIT_AUTH_REPO_URL=$(echo "$GIT_REPO_URL" | sed -e "s/:\/\//:\/\/$GIT_AUTH_USER:$GIT_TOKEN@/g")
+          GIT_REPO_NAME=$(echo "$GIT_REPO_URL" | awk -F'/' '{print $NF}')
+          GIT_REPO_BRANCH=$(ibmcloud schematics workspace get --id "$WORKSPACE_ID" --json | jq -r ".template_repo.branch")
+
+          if [ "$GIT_REPO_BRANCH" = "null" ]; then
+            echo "No branch provided."
+            exit 1
+          fi
+
+          cd /artifacts
+          git clone --branch "$GIT_REPO_BRANCH" "$GIT_AUTH_REPO_URL"
+
+          # run pre-commit
+          cd "/artifacts/$GIT_REPO_NAME"
+          pre-commit install --install-hooks
+          pre-commit run --all-files
+    - name: workspace-plan
+      #image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.41
+      image: de.icr.io/sandbox-nordcloud/pipeline-ubi:dev
+      env:
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: $(params.continuous-delivery-context-secret)
+              key: $(params.ibmcloud-apikey-secret-key)
+              optional: true
+        - name: WORKSPACE_ID
+          value: $(params.WORKSPACE_ID)
+        - name: IBM_CLOUD_API
+          value: $(params.ibmcloud-api)
+        - name: ENABLE_PLAN_APPLY
+          value: $(params.enable-automatic-plan-apply)
+      command: ["/bin/bash", "-c"]
+      args:
+        - |
+          #!/bin/bash
+
+          if [ "$ENABLE_PLAN_APPLY" != "true" ]; then
+            echo "Automatic plan and apply have been disabled. Re-enable by setting the enable-automatic-plan-apply environment property to true."
+            exit 0
+          fi
+
+          echo "Workspace $WORKSPACE_ID"
+
+          REGION="--no-region"
+          # only parse the region if its the *NEW* workspace id format
+          if [[ "$WORKSPACE_ID" == *".workspace"* ]]; then
+              REGION=" -r $(echo $WORKSPACE_ID | cut -f1 -d.)"
+          fi
+          echo "REGION: $REGION"
+
+          # force login (required by schematics cli)
+          ibmcloud login --apikey $API_KEY -a "$IBM_CLOUD_API" $REGION
+          # run schematics plan
+          echo "ibmcloud schematics plan --id $WORKSPACE_ID"
+          ACTIVITY=$(ibmcloud schematics plan -id $WORKSPACE_ID --json)
+          ACTIVITY_ID=$(echo $ACTIVITY | jq -r ".activityid")
+          echo "Activity ID   $ACTIVITY_ID"
+          # poll until status is COMPLETED, or if there is an error
+          while :
+          do
+            STATUS=$(ibmcloud schematics workspace action --id $WORKSPACE_ID --act-id $ACTIVITY_ID --json)
+
+            RET_VAL=$?
+            if [ $RET_VAL -ne 0 ]; then
+              echo $STATUS
+              exit $RET_VAL
+            else
+              STATUS_VALUE=$(echo $STATUS | jq -r ".status")
+              echo "Polling for status: $STATUS_VALUE"
+              if [ "$STATUS_VALUE" = "CREATED" ] || [ "$STATUS_VALUE" = "INPROGRESS" ]; then
+                # sleep for 5 seconds, while waiting for completion
+                sleep 5
+              elif [ "$STATUS_VALUE" = "COMPLETED" ]; then
+                ibmcloud schematics logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
+                exit 0
+              else
+                ibmcloud schematics logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
+                exit 1
+              fi
+            fi
+          done
+    - name: workspace-apply
+      #image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.41
+      image: de.icr.io/sandbox-nordcloud/pipeline-ubi:dev
+      env:
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: $(params.continuous-delivery-context-secret)
+              key: $(params.ibmcloud-apikey-secret-key)
+              optional: true
+        - name: WORKSPACE_ID
+          value: $(params.WORKSPACE_ID)
+        - name: IBM_CLOUD_API
+          value: $(params.ibmcloud-api)
+        - name: ENABLE_PLAN_APPLY
+          value: $(params.enable-automatic-plan-apply)
+      command: ["/bin/bash", "-c"]
+      args:
+        - |
+          #!/bin/bash
+
+          if [ "$ENABLE_PLAN_APPLY" != "true" ]; then
+            echo "Automatic plan and apply have been disabled. Re-enable by setting the enable-automatic-plan-apply environment property to true."
+            exit 0
+          fi
+
+          echo "Workspace $WORKSPACE_ID"
+
+          REGION="--no-region"
+          # only parse the region if its the *NEW* workspace id format
+          if [[ "$WORKSPACE_ID" == *".workspace"* ]]; then
+              REGION=" -r $(echo $WORKSPACE_ID | cut -f1 -d.)"
+          fi
+          echo "REGION: $REGION"
+
+          # force login (required by schematics cli)
+          ibmcloud login --apikey $API_KEY -a "$IBM_CLOUD_API" $REGION
+
+          # run schematics apply
+          echo "ibmcloud schematics apply --id $WORKSPACE_ID --force"
+          ACTIVITY=$(ibmcloud schematics apply -id $WORKSPACE_ID --json --force)
+          ACTIVITY_ID=$(echo $ACTIVITY | jq -r ".activityid")
+          echo "Activity ID   $ACTIVITY_ID"
+          # poll until status is COMPLETED, or if there is an error
+          while :
+          do
+            STATUS=$(ibmcloud schematics workspace action --id $WORKSPACE_ID --act-id $ACTIVITY_ID --json)
+
+            RET_VAL=$?
+            if [ $RET_VAL -ne 0 ]; then
+              echo $STATUS
+              exit $RET_VAL
+            else
+              STATUS_VALUE=$(echo $STATUS | jq -r ".status")
+              echo "Polling for status: $STATUS_VALUE"
+              if [ "$STATUS_VALUE" = "CREATED" ] || [ "$STATUS_VALUE" = "INPROGRESS" ]; then
+                # sleep for 5 seconds, while waiting for completion
+                sleep 5
+              elif [ "$STATUS_VALUE" = "COMPLETED" ]; then
+                ibmcloud schematics logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
+                exit 0
+              else
+                ibmcloud schematics logs --id $WORKSPACE_ID --act-id $ACTIVITY_ID
+                exit 1
+              fi
+            fi
+          done
+    - name: check-health
+      #image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.41
+      image: de.icr.io/sandbox-nordcloud/pipeline-ubi:dev
+      env:
+        - name: WORKSPACE_ID
+          value: $(params.WORKSPACE_ID)
+        - name: IBM_CLOUD_API
+          value: $(params.ibmcloud-api)
+        - name: ENABLE_PLAN_APPLY
+          value: $(params.enable-automatic-plan-apply)
+      command: ["/bin/bash", "-c"]
+      args:
+        - echo "You can add tests here to ensure that your resources are healthy!"

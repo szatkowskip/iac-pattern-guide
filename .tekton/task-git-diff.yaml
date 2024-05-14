@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: validate-task
+  name: git-diff-task
 spec:
   params:
     - name: ibmcloud-apikey-secret-key
@@ -24,9 +24,10 @@ spec:
   workspaces:
     - name: artifacts
       mountPath: /artifacts
+  results:
+    - name: diff
   steps:
-    - name: pre-commit
-      #image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.41
+    - name: check-changes
       image: de.icr.io/sandbox-nordcloud/pipeline-ubi:dev
       env:
         - name: API_KEY
@@ -74,7 +75,15 @@ spec:
           cd /artifacts
           git clone --branch "$GIT_REPO_BRANCH" "$GIT_AUTH_REPO_URL"
 
-          # run pre-commit
+          # Clone the repository to a temporary directory
           cd "/artifacts/$GIT_REPO_NAME"
-          pre-commit install --install-hooks
-          pre-commit run --all-files
+
+          # Check if there are any changes affecting the specified folder
+          git --no-pager diff --name-only multi-workspaces origin/multi-workspaces -- "/artifacts/$GIT_REPO_NAME/02-schematics"
+          if git diff --quiet multi-workspaces origin/multi-workspaces -- "/artifacts/$GIT_REPO_NAME/02-schematics"; then
+            echo "No changes affecting the folder"
+            printf false | tee $(results.diff.path)
+          else
+            echo "Changes affecting the folder"
+            printf true | tee $(results.diff.path)
+          fi

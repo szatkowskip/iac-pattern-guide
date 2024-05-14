@@ -1,0 +1,77 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: main-pipeline
+spec:
+  params:
+    - name: WORKSPACE_ID
+      description: workspace id
+    - name: ibmcloud-api
+      description: the ibmcloud api
+      default: https://cloud.ibm.com
+    - name: apikey
+      description: the IBM Cloud API key
+    - name: git-token
+      description: token to access the git repository
+    - name: enable-automatic-plan-apply
+      description: if true, a plan and apply will be automatically executed upon changes to the template code
+  workspaces:
+    - name: artifacts
+  tasks:
+    - name: git-diff
+      taskRef:
+        name: git-diff-task
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: WORKSPACE_ID
+          value: $(params.WORKSPACE_ID)
+        - name: ibmcloud-api
+          value: $(params.ibmcloud-api)
+        - name: apikey
+          value: $(params.apikey)
+        - name: git-token
+          value: $(params.git-token)
+        - name: enable-automatic-plan-apply
+          value: $(params.enable-automatic-plan-apply)
+    - name: workspace
+      when:
+        - input: "$(tasks.git-diff.results.diff)"
+          operator: in
+          values: ["true"]
+      taskRef:
+        name: workspace-task
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: WORKSPACE_ID
+          value: $(params.WORKSPACE_ID)
+        - name: ibmcloud-api
+          value: $(params.ibmcloud-api)
+        - name: apikey
+          value: $(params.apikey)
+        - name: git-token
+          value: $(params.git-token)
+        - name: enable-automatic-plan-apply
+          value: $(params.enable-automatic-plan-apply)
+    - name: validate
+      runAfter: [workspace]
+      taskRef:
+        name: validate-task
+      workspaces:
+        - name: artifacts
+          workspace: artifacts
+      params:
+        - name: WORKSPACE_ID
+          value: $(params.WORKSPACE_ID)
+        - name: ibmcloud-api
+          value: $(params.ibmcloud-api)
+        - name: apikey
+          value: $(params.apikey)
+        - name: git-token
+          value: $(params.git-token)
+        - name: enable-automatic-plan-apply
+          value: $(params.enable-automatic-plan-apply)
