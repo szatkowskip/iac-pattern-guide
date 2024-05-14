@@ -79,8 +79,8 @@ spec:
           cd "/artifacts/$GIT_REPO_NAME"
 
           # Check if there are any changes affecting the specified folder
-          git --no-pager diff --name-only multi-workspaces origin/multi-workspaces -- "/artifacts/$GIT_REPO_NAME/02-schematics"
-          if git diff --quiet multi-workspaces origin/multi-workspaces -- "/artifacts/$GIT_REPO_NAME/02-schematics"; then
+          git --no-pager diff --name-only HEAD^ HEAD -- "/artifacts/$GIT_REPO_NAME/02-schematics"
+          if git diff --quiet HEAD^ HEAD -- "/artifacts/$GIT_REPO_NAME/02-schematics"; then
             echo "No changes affecting the folder"
             printf false | tee $(results.diff.path)
           else
